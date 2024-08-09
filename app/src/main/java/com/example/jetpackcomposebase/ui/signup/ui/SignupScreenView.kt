@@ -1,6 +1,7 @@
 package com.example.jetpackcomposebase.ui.signup.ui
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,12 +48,14 @@ import androidx.navigation.NavController
 import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
 import com.example.jetpackcomposebase.navigation.Destination
+import com.example.jetpackcomposebase.navigation.NAV_HOME
 import com.example.jetpackcomposebase.navigation.NAV_LOGIN
 import com.example.jetpackcomposebase.navigation.NAV_PRIVACY_POLICY
 import com.example.jetpackcomposebase.navigation.navigateTo
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
+import com.example.jetpackcomposebase.ui.login.ui.loginView
 import com.example.jetpackcomposebase.ui.signup.viewmodel.SignupViewmodel
 import com.example.jetpackcomposebase.utils.DebugLog
 import kotlinx.coroutines.delay
@@ -76,22 +82,95 @@ fun SignupScreenView(
         )
         bottomBarVisibility(false)
         circularProgress(false)
-        observeData(
-            viewModel = signupViewModel,
-            context = context,
-            navController = navController,
-            circularProgress = { circularProgress(it) })
+        /* observeData(
+             viewModel = signupViewModel,
+             context = context,
+             navController = navController,
+             circularProgress = { circularProgress(it) })*/
         delay(2500)
 
     }
-    SignUpUI(navController = navController, signupViewModel = signupViewModel)
+    SignUpUI(navController = navController, signupViewModel = signupViewModel, circularProgress)
     BackHandler {
         navController?.popBackStack()
     }
 }
 
 @Composable
-fun SignUpUI(navController: NavController, signupViewModel: SignupViewmodel) {
+fun SignUpUI(
+    navController: NavController,
+    signupViewModel: SignupViewmodel,
+    circularProgress: (Boolean) -> Unit
+) {
+
+    val context = LocalContext.current
+    val responseApi by signupViewModel.signupResponse.collectAsState()
+
+
+    when (responseApi) {
+        is ResponseHandler.Loading -> {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
+            )
+        }
+
+        is ResponseHandler.OnError -> {
+            Log.d("TAG", "Signup:${(responseApi as ResponseHandler.OnError).message}")
+            Text(
+                text = "Error: ${(responseApi as ResponseHandler.OnError).message}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center),
+                color = Color.Blue
+            )
+        }
+
+        is ResponseHandler.OnSuccessResponse -> {
+
+            Log.d(
+                "TAG",
+                "LoginUI: on success${(responseApi as ResponseHandler.OnSuccessResponse).response?.status}"
+            )
+            if ((responseApi as ResponseHandler.OnSuccessResponse).response?.status_code == 200) {
+
+                navController.navigate(NAV_HOME)
+
+                navigateTo(
+                    navHostController = navController,
+                    route = Destination.HomeScreen.fullRoute,
+                    popUpToRoute = Destination.LoginScreen.fullRoute,
+                    isInclusive = true
+                )
+            } else {
+                signupView(navController = navController, signupViewModel = signupViewModel)
+                Toast.makeText(
+                    context,
+                    "${(responseApi as ResponseHandler.OnSuccessResponse).response?.message} ",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        is ResponseHandler.OnFailed -> {
+            Log.d("TAG", "LoginUI: failed ${(responseApi as ResponseHandler.OnFailed).message}")
+            Text(
+                text = "Error: ${(responseApi as ResponseHandler.OnFailed).message}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
+            )
+        }
+
+        else -> {
+            signupView(navController = navController, signupViewModel = signupViewModel)
+        }
+    }
+}
+
+@Composable
+fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -167,7 +246,8 @@ fun SignUpUI(navController: NavController, signupViewModel: SignupViewmodel) {
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
                     trailingIcon = {
-                        TextButton(onClick = { /* Toggle password visibility */ }) {
+                        TextButton(onClick = {
+                        }) {
                             Text("Show")
                         }
                     }

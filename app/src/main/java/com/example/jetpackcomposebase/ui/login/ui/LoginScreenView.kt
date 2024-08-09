@@ -146,27 +146,6 @@ fun LoginUI(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            /*  when {
-                 response.response.data?.userEmail?.isNotEmpty() == true -> {
-                      Toast.makeText(
-                          context,
-                          "Email:${it.response?.data?.userEmail}",
-                          Toast.LENGTH_SHORT
-                      ).show()
-  //                            navController.navigate(NAV_HOME)
-
-                      navigateTo(
-                          navHostController = navController,
-                          route = Destination.HomeScreen.fullRoute,
-                          popUpToRoute = Destination.LoginScreen.fullRoute,
-                          isInclusive = true
-                      )
-
-                  }
-
-                  else -> {
-                  }
-              }*/
         }
 
         is ResponseHandler.OnFailed -> {
