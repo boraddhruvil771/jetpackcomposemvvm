@@ -1,6 +1,7 @@
 package com.example.jetpackcomposebase.ui.signup.ui
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,11 +38,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
+import com.example.jetpackcomposebase.navigation.Destination
+import com.example.jetpackcomposebase.navigation.NAV_LOGIN
+import com.example.jetpackcomposebase.navigation.navigateTo
+import com.example.jetpackcomposebase.network.ResponseData
+import com.example.jetpackcomposebase.network.ResponseHandler
+import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
 import com.example.jetpackcomposebase.ui.signup.viewmodel.SignupViewmodel
+import com.example.jetpackcomposebase.utils.DebugLog
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignupScreenView(
@@ -162,7 +172,9 @@ fun SignUpUI(navController: NavController, signupViewModel: SignupViewmodel) {
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { /* Handle sign up action */ },
+                    onClick = {
+                        signupViewModel.callSignup(ssn, mobileNumber, password)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = ssn.isNotEmpty() && mobileNumber.isNotEmpty() && password.isNotEmpty()
                 ) {
@@ -212,6 +224,47 @@ fun observeData(
     circularProgress: (Boolean) -> Unit
 ) {
 
+    viewModel.viewModelScope.launch {
+        viewModel.signupResponse.collect {
+            when (it) {
+                is ResponseHandler.Loading -> {
+                    circularProgress(true)
+                }
 
+                is ResponseHandler.OnFailed -> {
+                    circularProgress(false)
+                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?> -> {
+                    when {
+                        it.response?.data?.userEmail?.isNotEmpty() == true -> {
+                            DebugLog.e("response : email:${it.response.data?.userEmail}")
+                            Toast.makeText(
+                                context,
+                                "Email:${it.response.data?.userEmail}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navController.navigate(NAV_LOGIN)
+
+                            navigateTo(
+                                navHostController = navController,
+                                route = Destination.LoginScreen.fullRoute,
+                                popUpToRoute = Destination.LoginScreen.fullRoute,
+                                isInclusive = true
+                            )
+                        }
+
+                        else -> {
+                        }
+                    }
+                }
+
+                else -> {
+                    circularProgress(false)
+                }
+            }
+        }
+    }
 }
 

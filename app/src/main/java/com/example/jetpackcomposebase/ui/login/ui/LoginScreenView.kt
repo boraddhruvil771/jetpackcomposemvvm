@@ -276,49 +276,5 @@ fun observeData(
 
             }
         }
-        /*
-                viewModel.loginResponse.observe(this, Observer {
-                    when (it) {
-                        is ResponseHandler.Loading -> {
-                            circularProgress(true)
-                        }
-
-                        is ResponseHandler.OnFailed -> {
-                            circularProgress(false)
-                            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-                        }
-
-                        is ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?> -> {
-                            when {
-                                it.response?.data?.userEmail?.isNotEmpty() == true -> {
-                                    DebugLog.e("response : email:${it.response?.data?.userEmail}")
-                                    Toast.makeText(
-                                        context,
-                                        "Email:${it.response?.data?.userEmail}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-        //                            navController.navigate(NAV_HOME)
-
-                                    navigateTo(
-                                        navHostController = navController,
-                                        route = Destination.HomeScreen.fullRoute,
-                                        popUpToRoute = Destination.LoginScreen.fullRoute,
-                                        isInclusive = true
-                                    )
-
-                                }
-
-                                else -> {
-                                }
-                            }
-                        }
-
-                        else -> {
-                            circularProgress(false)
-                        }
-
-                    }
-                })
-        */
     }
 }
