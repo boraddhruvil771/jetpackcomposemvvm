@@ -45,6 +45,7 @@ import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
 import com.example.jetpackcomposebase.navigation.Destination
 import com.example.jetpackcomposebase.navigation.NAV_LOGIN
+import com.example.jetpackcomposebase.navigation.NAV_PRIVACY_POLICY
 import com.example.jetpackcomposebase.navigation.navigateTo
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
@@ -198,7 +199,9 @@ fun SignUpUI(navController: NavController, signupViewModel: SignupViewmodel) {
             Row(
                 horizontalArrangement = Arrangement.Center,
             ) {
-                TextButton(onClick = { /* Navigate to Privacy Policy */ }) {
+                TextButton(onClick = {
+                    navController.navigate(NAV_PRIVACY_POLICY)
+                }) {
                     Text(
                         text = "Privacy Policy",
                         color = MaterialTheme.colorScheme.primary,
@@ -208,7 +211,9 @@ fun SignUpUI(navController: NavController, signupViewModel: SignupViewmodel) {
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "&", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                 Spacer(modifier = Modifier.width(4.dp))
-                TextButton(onClick = { /* Navigate to Terms and Conditions */ }) {
+                TextButton(onClick = {
+                    navController.navigate(NAV_PRIVACY_POLICY)
+                }) {
                     Text(
                         text = "Term and Condition",
                         color = MaterialTheme.colorScheme.primary,
