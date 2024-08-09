@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JetpackComposeBase</string>
+    <string name="home_title">بيت</string>
+    <string name="account_title">حساب</string>
+    <string name="lbl_setting">إعدادات</string>
+    <string name="drawer_about">"عن "</string>
+    <string name="drawer_logout">"تسجيل خروج "</string>
+    <string name="lbl_login">"تسجيل الدخول "</string>
+    <string name="lbl_login_here">"تسجيل الدخول هنا "</string>
+    <string name="lbl_username">"اسم المستخدم "</string>
+    <string name="lbl_password">"كلمة المرور "</string>
+    <string name="lbl_profile">"حساب تعريفي "</string>
+    <string name="lbl_click_me">"انقر فوق لي "</string>
+    <string name="lbl_english">إنجليزي</string>
+    <string name="lbl_real_name">"الاسم الحقيقي : "</string>
+    <string name="lbl_actor_name">"اسم الممثل : "</string>
+    <string name="lbl_arabic">عربي</string>
+    <string name="lbl_select_language">"اختار اللغة "</string>
+</resources>

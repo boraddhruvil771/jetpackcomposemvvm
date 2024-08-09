@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">JetpackComposeBase</string>
+
+    <string name="home_title">Home</string>
+    <string name="account_title">Account</string>
+
+
+    <string name="lbl_setting">Settings</string>
+    <string name="drawer_about">About</string>
+    <string name="lbl_profile">Profile</string>
+    <string name="drawer_logout">Logout</string>
+    <string name="lbl_select_language">Select Language</string>
+
+    <!--Login-->
+    <string name="lbl_login">Login</string>
+    <string name="lbl_login_here">Login Here</string>
+    <string name="lbl_username">Username</string>
+    <string name="lbl_password">Password</string>
+    <string name="lbl_click_me">Click Me</string>
+    <string name="lbl_english">English</string>
+    <string name="lbl_arabic">Arabic</string>
+
+
+    <string name="lbl_real_name">Real name :</string>
+    <string name="lbl_actor_name">Actor name :</string>
+
+
+
+    <string name="drawer_menu_description">Menu navigation button</string>
+    <string name="drawer_home_description">Home navigation button</string>
+    <string name="drawer_settings_description">Settings navigation button</string>
+    <string name="drawer_info_description">About navigation button</string>
+    <string name="lbl_jetpack_compose">Jetpack Compose</string>
+
+</resources>
