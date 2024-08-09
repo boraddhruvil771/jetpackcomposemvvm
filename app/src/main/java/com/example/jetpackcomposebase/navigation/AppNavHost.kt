@@ -17,6 +17,8 @@ import com.example.jetpackcomposebase.ui.dashboard.ui.HomeScreenView
 import com.example.jetpackcomposebase.ui.dashboard.viewmodel.HomeViewModel
 import com.example.jetpackcomposebase.ui.login.ui.LoginScreenView
 import com.example.jetpackcomposebase.ui.login.viewmodel.LoginViewModel
+import com.example.jetpackcomposebase.ui.privcacypolicy.ui.PrivacyPolicyUI
+import com.example.jetpackcomposebase.ui.privcacypolicy.viewmodel.PrivacyPolicyViewmodel
 import com.example.jetpackcomposebase.ui.profile.ui.ProfileScreenView
 import com.example.jetpackcomposebase.ui.settings.ui.SettingScreenView
 import com.example.jetpackcomposebase.ui.settings.viewmodel.SettingViewModel
@@ -24,6 +26,7 @@ import com.example.jetpackcomposebase.ui.signup.ui.SignupScreenView
 import com.example.jetpackcomposebase.ui.signup.viewmodel.SignupViewmodel
 import com.example.jetpackcomposebase.ui.splash.ui.SplashScreenView
 import com.example.jetpackcomposebase.ui.splash.viewmodel.SplashViewModel
+
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -51,6 +54,19 @@ fun AppNavHost(
                 topBar = topBar,
                 bottomBarVisibility = { bottomBarVisibility(it) },
             )
+        }
+
+        composable(Destination.LoginScreen.fullRoute) {
+            val viewModel = hiltViewModel<LoginViewModel>()
+
+            LoginScreenView(
+                navController = navController,
+                loginViewModel = viewModel,
+                topBar = topBar,
+                bottomBarVisibility = { bottomBarVisibility(it) },
+                circularProgress = circularProgress
+            )
+
         }
 
         composable(Destination.LoginScreen.fullRoute) {
@@ -111,7 +127,20 @@ fun AppNavHost(
                 circularProgress = circularProgress
             )
         }
+        composable(Destination.privacyPolicyScreen.fullRoute) {
+            val viewModel = hiltViewModel<PrivacyPolicyViewmodel>()
+            PrivacyPolicyUI(
+                navController = navController,
+                drawerState = drawerState,
+                topBar = topBar,
+                bottomBarVisibility = { bottomBarVisibility(it) },
+                circularProgress = circularProgress
+            )
+        }
+
     }
+
+
 }
 
 

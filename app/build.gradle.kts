@@ -198,5 +198,7 @@ dependencies {
     implementation(libs.sentry.android)
     implementation(libs.sentry.compose.android)
 
-    //localzy
+    // Webview
+    implementation(libs.androidx.webkit)
+
 }

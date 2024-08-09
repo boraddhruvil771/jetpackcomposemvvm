@@ -18,13 +18,6 @@ open class SignupRepository @Inject constructor(private val apiInterface: ApiInt
     BaseRepository() {
     private val TAG = "SignupRepository"
 
-    open suspend fun  callSignUpAPI(signUpRequest: SignUpRequest): ResponseHandler<ResponseData<LoginResponseModel>?> {
-        return makeAPICall {
-            apiInterface.getSignUp(signUpRequest)
-        }
-    }
-
-
     open suspend fun callSignUpAPIOld(
         ssn: String, mobileNumber: String, password: String
     ): Flow<ResponseHandler<ResponseData<LoginResponseModel>?>> = flow {

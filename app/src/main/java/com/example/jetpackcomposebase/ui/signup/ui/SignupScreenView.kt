@@ -2,6 +2,7 @@ package com.example.jetpackcomposebase.ui.signup.ui
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -69,7 +70,7 @@ fun SignupScreenView(
                 title = "Login",
                 isVisible = false,
                 isDrawerIcon = false,
-                isBackIconVisible = false
+                isBackIconVisible = true,
             )
         )
         bottomBarVisibility(false)
@@ -80,9 +81,12 @@ fun SignupScreenView(
             navController = navController,
             circularProgress = { circularProgress(it) })
         delay(2500)
-        navController.popBackStack()
+
     }
     SignUpUI(navController = navController, signupViewModel = signupViewModel)
+    BackHandler {
+        navController?.popBackStack()
+    }
 }
 
 @Composable
@@ -90,7 +94,6 @@ fun SignUpUI(navController: NavController, signupViewModel: SignupViewmodel) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
         // State variables for holding input values
         var ssn by remember { mutableStateOf("") }

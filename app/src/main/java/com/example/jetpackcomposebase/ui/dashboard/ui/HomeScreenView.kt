@@ -42,6 +42,12 @@ fun HomeScreenView(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val responseHandler by viewModel.state.collectAsState()
+//    viewModel.callGetTelemedicineDetail()
+    viewModel.callGetDirectPrimaryCareResponse()
+//    viewModel.callPediatricTelemedicineDetail()
+    val getDirectPrimaryCareResponse by viewModel.getDirectPrimaryCareResponse.collectAsState()
+//    val getPediatricTelemedicineDetail by viewModel.getPediatricTelemedicineDetail.collectAsState()
+//    val telemedicineResponse by viewModel.telemedicineResponse.collectAsState()
 
     LaunchedEffect(Unit) {
         topBar(
@@ -64,23 +70,31 @@ fun HomeScreenView(
                     .wrapContentSize(align = Alignment.Center)
             )
         }
+
         is ResponseHandler.OnError -> {
             Text(
                 text = "Error: ${(responseHandler as ResponseHandler.OnError).message}",
-                modifier = Modifier.fillMaxSize().wrapContentSize(align = Alignment.Center)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
             )
         }
+
         is ResponseHandler.OnSuccessResponse -> {
+
             LazyColumn {
                 items((responseHandler as ResponseHandler.OnSuccessResponse<List<MovieCharacter>>).response) { item ->
                     HomeUI(character = item)
                 }
             }
         }
+
         else -> {
             Text(
                 text = "No data available",
-                modifier = Modifier.fillMaxSize().wrapContentSize(align = Alignment.Center)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
             )
         }
     }

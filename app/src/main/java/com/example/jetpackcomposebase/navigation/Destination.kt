@@ -18,6 +18,8 @@ sealed class Destination(protected val route: String, vararg params: String) {
     data object SettingsScreen : NoArgumentsDestination(NAV_SETTINGS)
     data object ProfileScreen : NoArgumentsDestination(NAV_PROFILE)
     data object signupScreen : NoArgumentsDestination(NAV_SIGNUP)
+    data object privacyPolicyScreen : NoArgumentsDestination(NAV_PRIVACY_POLICY)
+
 
 
 }

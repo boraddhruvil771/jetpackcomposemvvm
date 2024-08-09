@@ -20,6 +20,14 @@ open class ResponseData<T> {
 
     var listOfData: List<T>? = null
 
+    @JsonProperty("status")
+    var status: String? = null
+
+    @JsonProperty("message")
+    var message: String? = null
+    @JsonProperty("status_code")
+    var status_code: Int? = null
+
 
     /**
     * JsonAnySetter : This Annotation is used to handle some json properties manually

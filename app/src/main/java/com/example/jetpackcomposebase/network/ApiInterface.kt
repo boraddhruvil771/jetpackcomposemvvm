@@ -1,5 +1,7 @@
 package com.example.jetpackcomposebase.network
 
+import com.example.jetpackcomposebase.ui.dashboard.model.GetDirectPrimaryCareResponse
+import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
 import com.example.jetpackcomposebase.ui.dashboard.model.MovieCharacter
 import com.example.jetpackcomposebase.ui.login.model.LoginRequest
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
@@ -24,5 +26,20 @@ interface ApiInterface {
 
     @POST(ApiHelper.SIGNUP_API)
     suspend fun getSignUp(@Body signUpRequest: SignUpRequest): Response<ResponseData<LoginResponseModel>>
+
+    @POST(ApiHelper.GET_TELEMEDICINE_DETAIL_API)
+    suspend fun getPediatricTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
+/*
+    @POST(ApiHelper.GET_TELEMEDICINE_DETAIL_API)
+    suspend fun getPediatricTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
+
+    @POST(ApiHelper.GET_TELEMEDICINE_API)
+    suspend fun getTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
+
+    @GET(ApiHelper.PRIMARY_CARE_API)
+    suspend fun getDirectPrimaryCareDetail(): Response<ResponseData<GetDirectPrimaryCareResponse>>
+
+*/
+
 
 }

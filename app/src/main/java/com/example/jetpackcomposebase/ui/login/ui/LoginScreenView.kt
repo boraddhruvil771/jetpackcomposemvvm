@@ -1,6 +1,7 @@
 package com.example.jetpackcomposebase.ui.login.ui
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -52,14 +55,14 @@ import androidx.navigation.NavController
 import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
 import com.example.jetpackcomposebase.navigation.Destination
+import com.example.jetpackcomposebase.navigation.NAV_HOME
+import com.example.jetpackcomposebase.navigation.NAV_PRIVACY_POLICY
 import com.example.jetpackcomposebase.navigation.NAV_SIGNUP
 import com.example.jetpackcomposebase.navigation.navigateTo
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
 import com.example.jetpackcomposebase.ui.login.viewmodel.LoginViewModel
-import com.example.jetpackcomposebase.utils.DebugLog
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,7 +75,7 @@ fun LoginScreenView(
 ) {
 
     val context = LocalContext.current
-    val responseList by loginViewModel.loginResponse.collectAsState()
+
     LaunchedEffect(Unit) {
         topBar(
             ToolBarData(
@@ -84,27 +87,109 @@ fun LoginScreenView(
         )
         bottomBarVisibility(false)
         circularProgress(false)
-        observeData(
-            viewModel = loginViewModel,
-            context = context,
-            navController = navController,
-            circularProgress = { circularProgress(it) })
-        delay(2500)
-        navController.popBackStack()
     }
-    LoginUI(navController = navController, loginViewModel = loginViewModel)
+    LoginUI(navController = navController, loginViewModel = loginViewModel, circularProgress)
 }
 
 
 @Composable
 fun LoginUI(
     navController: NavController,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    circularProgress: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
+    val responseApi by loginViewModel.loginResponse.collectAsState()
+
+
+    when (responseApi) {
+        is ResponseHandler.Loading -> {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
+            )
+        }
+
+        is ResponseHandler.OnError -> {
+            Log.d("TAG", "LoginUI:${(responseApi as ResponseHandler.OnError).message}")
+            Text(
+                text = "Error: ${(responseApi as ResponseHandler.OnError).message}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center),
+                color = Color.Blue
+            )
+        }
+
+        is ResponseHandler.OnSuccessResponse -> {
+
+            Log.d(
+                "TAG",
+                "LoginUI: on success${(responseApi as ResponseHandler.OnSuccessResponse).response?.status}"
+            )
+            if ((responseApi as ResponseHandler.OnSuccessResponse).response?.status_code == 200) {
+
+                navController.navigate(NAV_HOME)
+
+                navigateTo(
+                    navHostController = navController,
+                    route = Destination.HomeScreen.fullRoute,
+                    popUpToRoute = Destination.LoginScreen.fullRoute,
+                    isInclusive = true
+                )
+            } else {
+                loginView(navController = navController)
+                Toast.makeText(
+                    context,
+                    "${(responseApi as ResponseHandler.OnSuccessResponse).response?.message} ",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            /*  when {
+                 response.response.data?.userEmail?.isNotEmpty() == true -> {
+                      Toast.makeText(
+                          context,
+                          "Email:${it.response?.data?.userEmail}",
+                          Toast.LENGTH_SHORT
+                      ).show()
+  //                            navController.navigate(NAV_HOME)
+
+                      navigateTo(
+                          navHostController = navController,
+                          route = Destination.HomeScreen.fullRoute,
+                          popUpToRoute = Destination.LoginScreen.fullRoute,
+                          isInclusive = true
+                      )
+
+                  }
+
+                  else -> {
+                  }
+              }*/
+        }
+
+        is ResponseHandler.OnFailed -> {
+            Log.d("TAG", "LoginUI: failed ${(responseApi as ResponseHandler.OnFailed).message}")
+            Text(
+                text = "Error: ${(responseApi as ResponseHandler.OnFailed).message}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
+            )
+        }
+
+        else -> {
+            loginView(navController = navController)
+        }
+    }
+}
+
+@Composable
+fun loginView(navController: NavController, loginViewModel: LoginViewModel = hiltViewModel()) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
 
         val (loginText, customTextFieldUserName, customTextFieldPassword, customButton) = createRefs()
@@ -208,7 +293,9 @@ fun LoginUI(
             Row {
                 ClickableText(
                     text = AnnotatedString("Privacy Policy"),
-                    onClick = { /* handle privacy policy */ },
+                    onClick = {
+                        navController.navigate(NAV_PRIVACY_POLICY)
+                    },
                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary)
                 )
                 Text(
@@ -217,7 +304,9 @@ fun LoginUI(
                 )
                 ClickableText(
                     text = AnnotatedString("Term and Condition"),
-                    onClick = { /* handle terms and conditions */ },
+                    onClick = {
+                        navController.navigate(NAV_PRIVACY_POLICY)
+                    },
                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary)
                 )
             }
@@ -246,28 +335,7 @@ fun observeData(
                 }
 
                 is ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?> -> {
-                    when {
-                        it.response?.data?.userEmail?.isNotEmpty() == true -> {
-                            DebugLog.e("response : email:${it.response?.data?.userEmail}")
-                            Toast.makeText(
-                                context,
-                                "Email:${it.response?.data?.userEmail}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-//                            navController.navigate(NAV_HOME)
 
-                            navigateTo(
-                                navHostController = navController,
-                                route = Destination.HomeScreen.fullRoute,
-                                popUpToRoute = Destination.LoginScreen.fullRoute,
-                                isInclusive = true
-                            )
-
-                        }
-
-                        else -> {
-                        }
-                    }
                 }
 
                 else -> {

@@ -12,7 +12,7 @@ object Constants {
 
     var DSN =
         "https://e68671b99bf2afd717617c18a3aa1dc4@o4507655094140928.ingest.us.sentry.io/4507666947309568"
-    var PRIVATE_POLICY = "https://admin.encorehealthcare.us/privacy-policy";
+    var PRIVATE_POLICY = "https://www.brainvire.com/";
 
     object DataStore {
         val SECURED_DATA = stringPreferencesKey("secured_data")

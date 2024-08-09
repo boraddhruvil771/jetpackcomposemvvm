@@ -28,6 +28,7 @@ open class LoginRepository @Inject constructor(private val apiInterface: ApiInte
 
             if (response.isSuccessful) {
                 response.body()?.let {
+                    it.data
                     emit(ResponseHandler.OnSuccessResponse(it))
                 } ?: emit(ResponseHandler.OnFailed(response.code(), "Empty response body", ""))
             } else {

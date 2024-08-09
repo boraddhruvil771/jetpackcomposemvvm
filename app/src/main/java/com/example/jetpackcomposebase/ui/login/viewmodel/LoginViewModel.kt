@@ -38,8 +38,9 @@ class LoginViewModel @Inject constructor(
               _loginResponse.postValue(ResponseHandler.Loading)
               _loginResponse.value = repository.callLoginAPI(mobileNumber, password)
           }*/
+        _loginResponse.value=ResponseHandler.Loading
         viewModelScope.launch {
-            repository.callLoginAPI(mobileNumber, password).collect { it ->
+            repository.callLoginAPI(mobileNumber, password).collect {
                 _loginResponse.value = it
             }
         }
