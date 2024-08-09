@@ -55,7 +55,6 @@ import com.example.jetpackcomposebase.navigation.navigateTo
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
-import com.example.jetpackcomposebase.ui.login.ui.loginView
 import com.example.jetpackcomposebase.ui.signup.viewmodel.SignupViewmodel
 import com.example.jetpackcomposebase.utils.DebugLog
 import kotlinx.coroutines.delay
@@ -181,6 +180,11 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
         var password by remember { mutableStateOf("") }
 
 
+        var isssnValid by remember { mutableStateOf(true) }
+        var isMobileNumberValid by remember { mutableStateOf(true) }
+        var isPasswordValid by remember { mutableStateOf(true) }
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -223,6 +227,7 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
                     value = ssn,
                     onValueChange = { ssn = it },
                     label = { Text("SSN") },
+                    isError = !isssnValid,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -232,6 +237,7 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
                 OutlinedTextField(
                     value = mobileNumber,
                     onValueChange = { mobileNumber = it },
+                    isError = !isMobileNumberValid,
                     label = { Text("Mobile Number") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
@@ -243,6 +249,7 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Password") },
+                    isError = !isPasswordValid,
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),
                     trailingIcon = {
@@ -257,7 +264,13 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
 
                 Button(
                     onClick = {
-                        signupViewModel.callSignup(ssn, mobileNumber, password)
+                        isssnValid = ssn.isNotEmpty()
+                        isMobileNumberValid = mobileNumber.isNotEmpty()
+                        isPasswordValid = password.isNotEmpty()
+
+                        if (isssnValid && isMobileNumberValid && isPasswordValid) {
+                            signupViewModel.callSignup(ssn, mobileNumber, password)
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = ssn.isNotEmpty() && mobileNumber.isNotEmpty() && password.isNotEmpty()

@@ -178,6 +178,9 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
         var password by remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
 
+        var isMobileNumberValid by remember { mutableStateOf(true) }
+        var isPasswordValid by remember { mutableStateOf(true) }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -206,6 +209,7 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
                 value = mobileNumber,
                 onValueChange = { mobileNumber = it },
                 label = { Text("Mobile Number") },
+                isError = !isMobileNumberValid,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -216,6 +220,7 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
+                isError = !isPasswordValid, // Set error state
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     val image = if (passwordVisible)
@@ -243,7 +248,11 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
 
             Button(
                 onClick = {
-                    loginViewModel.callLoginAPI(mobileNumber, password)
+                    isMobileNumberValid = mobileNumber.isNotEmpty()
+                    isPasswordValid = password.isNotEmpty()
+                    if (isMobileNumberValid && isPasswordValid) {
+                        loginViewModel.callLoginAPI(mobileNumber, password)
+                    }
                 },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
