@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
@@ -63,7 +62,9 @@ import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
 import com.example.jetpackcomposebase.ui.login.viewmodel.LoginViewModel
-import kotlinx.coroutines.launch
+import com.example.jetpackcomposebase.utils.CommonUtils
+import com.example.jetpackcomposebase.utils.Constants
+import com.example.jetpackcomposebase.utils.MyPreference
 
 @Composable
 fun LoginScreenView(
@@ -71,10 +72,9 @@ fun LoginScreenView(
     loginViewModel: LoginViewModel = hiltViewModel(),
     bottomBarVisibility: (Boolean) -> Unit,
     topBar: (ToolBarData) -> Unit,
-    circularProgress: (Boolean) -> Unit
+    circularProgress: (Boolean) -> Unit,
 ) {
 
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         topBar(
@@ -84,6 +84,7 @@ fun LoginScreenView(
         )
         bottomBarVisibility(false)
         circularProgress(false)
+
     }
     LoginUI(navController = navController, loginViewModel = loginViewModel, circularProgress)
 }
@@ -97,7 +98,7 @@ fun LoginUI(
 ) {
     val context = LocalContext.current
     val responseApi by loginViewModel.loginResponse.collectAsState()
-
+    val mPref = MyPreference(context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE))  // Initialize mPref here
 
     when (responseApi) {
         is ResponseHandler.Loading -> {
@@ -126,6 +127,60 @@ fun LoginUI(
                 "LoginUI: on success${(responseApi as ResponseHandler.OnSuccessResponse).response?.status}"
             )
             if ((responseApi as ResponseHandler.OnSuccessResponse).response?.status_code == 200) {
+                CommonUtils.IS_LOGIN = true.toString()
+
+                CommonUtils.setData(
+                    context,
+                    CommonUtils.tier,
+                    (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data?.userTiear.toString()
+                )
+
+                CommonUtils.setData(
+                    context,
+                    CommonUtils.HAS_MEDICAL_PLAN,
+                    (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data?.hasMedicalPlan.toString()
+                )
+
+                CommonUtils.setData(
+                    context,
+                    CommonUtils.USER_PARENT_TIEAR,
+                    (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data?.userParentTiear.toString()
+                )
+
+                (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data?.accessToken?.let { it1 ->
+                    mPref.setValueString(
+                        Constants.AUTH_TOKEN,
+                        it1
+                    )
+                }
+                (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data?.userTiear?.let { it1 ->
+                    mPref.setValueInt(
+                        Constants.TIER,
+                        it1
+                    )
+                }
+                CommonUtils.updateFCMTokenInPreference(context)
+
+                CommonUtils.setData(
+                    context,
+                    CommonUtils.IS_LOGIN,
+                    "true"
+                )
+
+                mPref.setValueBoolean(Constants.IS_LOGIN, true)
+                mPref.setBeanValue(
+                    Constants.LOGIN_MODEL,
+                    (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data!!
+                )
+                navController.navigate(NAV_HOME)
+
+                CommonUtils.setData(
+                    context,
+                    CommonUtils.USER_SNN,
+                    (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data?.userSSN.toString()
+                )
+                CommonUtils.IS_LOGGED_IN_OTP = false
+                CommonUtils.IS_LOGGED_IN = true
 
                 navController.navigate(NAV_HOME)
 
@@ -136,7 +191,7 @@ fun LoginUI(
                     isInclusive = true
                 )
             } else {
-                loginView(navController = navController)
+                LoginView(navController = navController)
                 Toast.makeText(
                     context,
                     "${(responseApi as ResponseHandler.OnSuccessResponse).response?.message} ",
@@ -156,19 +211,17 @@ fun LoginUI(
         }
 
         else -> {
-            loginView(navController = navController)
+            LoginView(navController = navController)
         }
     }
 }
 
+
 @Composable
-fun loginView(navController: NavController, loginViewModel: LoginViewModel = hiltViewModel()) {
+fun LoginView(navController: NavController, loginViewModel: LoginViewModel = hiltViewModel()) {
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
-
-        val (loginText, customTextFieldUserName, customTextFieldPassword, customButton) = createRefs()
-        val centerGuideline = createGuidelineFromTop(0.3f)
 
         var mobileNumber by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
@@ -294,35 +347,3 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
     }
 }
 
-
-fun observeData(
-    viewModel: LoginViewModel,
-    context: Context,
-    navController: NavController,
-    circularProgress: (Boolean) -> Unit
-) {
-
-    viewModel.viewModelScope.launch {
-        viewModel.loginResponse.collect {
-            when (it) {
-                is ResponseHandler.Loading -> {
-                    circularProgress(true)
-                }
-
-                is ResponseHandler.OnFailed -> {
-                    circularProgress(false)
-                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-                }
-
-                is ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?> -> {
-
-                }
-
-                else -> {
-                    circularProgress(false)
-                }
-
-            }
-        }
-    }
-}

@@ -1,7 +1,5 @@
 package com.example.jetpackcomposebase.ui.dashboard.ui
 
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +29,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.jetpackcomposebase.base.ToolBarData
 import com.example.jetpackcomposebase.network.ResponseHandler
-import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
+import com.example.jetpackcomposebase.ui.dashboard.model.NotificationData
 import com.example.jetpackcomposebase.ui.dashboard.viewmodel.HomeViewModel
 
 @Composable
@@ -44,8 +42,9 @@ fun HomeScreenView(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val responseHandlercard by viewModel.getDirectPrimaryCareResponse.collectAsState()
+    val notificationListData by viewModel.notificationCountResponse.collectAsState()
 
-
+    viewModel.callNotificationList(1, 20)
     LaunchedEffect(Unit) {
         topBar(
             ToolBarData(
@@ -59,7 +58,7 @@ fun HomeScreenView(
         bottomBarVisibility(true)
     }
 
-    when (responseHandlercard) {
+    when (notificationListData) {
         is ResponseHandler.Loading -> {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -79,17 +78,8 @@ fun HomeScreenView(
 
         is ResponseHandler.OnSuccessResponse -> {
 
-
-            lateinit var context: Context
-            lateinit var sharedPreferences: SharedPreferences
-
-            // Initialize SharedPreferences
-            sharedPreferences = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
-
-            // Set a boolean value
-            setLoginStatus(true)
             LazyColumn {
-                items((responseHandlercard as ResponseHandler.OnSuccessResponse<List<GetPediatricTelemedicineResponse>>).response) { item ->
+                items((responseHandlercard as ResponseHandler.OnSuccessResponse<List<NotificationData.NotificationItem>>).response) { item ->
                     HomeUI(character = item)
                 }
             }
@@ -107,18 +97,10 @@ fun HomeScreenView(
     }
 }
 
-fun setLoginStatus(b: Boolean) {
-    lateinit var sharedPreferences: SharedPreferences
-    val editor = sharedPreferences.edit()
-    editor.putBoolean("isLogin", b)
-    editor.apply()
-}
-
-
 @Composable
-fun HomeUI(character: GetPediatricTelemedicineResponse) {
+fun HomeUI(character: NotificationData.NotificationItem) {
     val imagerPainter =
-        rememberAsyncImagePainter(model = character.specialitiesDashBoardItems?.get(0)?.name)
+        rememberAsyncImagePainter(model = character, placeholder = null)
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -145,11 +127,10 @@ fun HomeUI(character: GetPediatricTelemedicineResponse) {
                         .fillMaxWidth()
                         .padding(4.dp)
                 ) {
-                    Text(text = "Real name: ${character.specialitiesDashBoardItems}")
+                    Text(text = "Real name: ${character.title}")
                     Text(
                         text = "Actor name: ${
-                            character.specialities?.get(0)
-                                ?.name
+                            character.userId
                         }"
                     )
                 }
