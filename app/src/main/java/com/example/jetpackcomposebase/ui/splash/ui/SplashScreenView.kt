@@ -1,11 +1,12 @@
 package com.example.jetpackcomposebase.ui.splash.ui
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
+import com.example.jetpackcomposebase.navigation.NAV_HOME
 import com.example.jetpackcomposebase.navigation.NAV_LOGIN
 import com.example.jetpackcomposebase.ui.theme.MainComposeTheme
 import kotlinx.coroutines.delay
@@ -26,6 +28,10 @@ fun SplashScreenView(
     bottomBarVisibility: (Boolean) -> Unit,
     topBar: (ToolBarData) -> Unit,
 ) {
+
+    lateinit var context: Context
+    lateinit var sharedPreferences: SharedPreferences
+
     MainComposeTheme {
         LaunchedEffect(key1 = true) {
             topBar(
@@ -41,6 +47,11 @@ fun SplashScreenView(
             delay(2500)
             navController?.popBackStack()
             navController?.navigate(NAV_LOGIN)
+            /* if (sharedPreferences.getBoolean("isLogin", false)) {
+                 navController?.navigate(NAV_HOME)
+             } else {
+                 navController?.navigate(NAV_LOGIN)
+             }*/
         }
 
         Box(

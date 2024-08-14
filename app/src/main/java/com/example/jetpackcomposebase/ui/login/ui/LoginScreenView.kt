@@ -79,10 +79,7 @@ fun LoginScreenView(
     LaunchedEffect(Unit) {
         topBar(
             ToolBarData(
-                title = "Login",
-                isVisible = false,
-                isDrawerIcon = false,
-                isBackIconVisible = false
+                title = "Login", isVisible = false, isDrawerIcon = false, isBackIconVisible = false
             )
         )
         bottomBarVisibility(false)
@@ -167,8 +164,7 @@ fun LoginUI(
 @Composable
 fun loginView(navController: NavController, loginViewModel: LoginViewModel = hiltViewModel()) {
     ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
 
         val (loginText, customTextFieldUserName, customTextFieldPassword, customButton) = createRefs()
@@ -223,8 +219,7 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
                 isError = !isPasswordValid, // Set error state
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Filled.Visibility
+                    val image = if (passwordVisible) Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -237,14 +232,12 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
                     .padding(bottom = 16.dp)
             )
 
-            Text(
-                text = "Forgot Password?",
+            Text(text = "Forgot Password?",
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(bottom = 16.dp)
-                    .clickable { /* handle click */ }
-            )
+                    .clickable { /* handle click */ })
 
             Button(
                 onClick = {
@@ -265,8 +258,7 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Don't Have an Account? ",
-                modifier = Modifier.padding(bottom = 4.dp)
+                text = "Don't Have an Account? ", modifier = Modifier.padding(bottom = 4.dp)
             )
             ClickableText(
                 text = AnnotatedString("Sign up"),

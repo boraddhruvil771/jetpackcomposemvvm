@@ -1,5 +1,7 @@
 package com.example.jetpackcomposebase.ui.dashboard.ui
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +31,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.jetpackcomposebase.base.ToolBarData
 import com.example.jetpackcomposebase.network.ResponseHandler
-import com.example.jetpackcomposebase.ui.dashboard.model.MovieCharacter
+import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
 import com.example.jetpackcomposebase.ui.dashboard.viewmodel.HomeViewModel
 
 @Composable
@@ -41,13 +43,8 @@ fun HomeScreenView(
     circularProgress: (Boolean) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val responseHandler by viewModel.state.collectAsState()
-//    viewModel.callGetTelemedicineDetail()
-    viewModel.callGetDirectPrimaryCareResponse()
-//    viewModel.callPediatricTelemedicineDetail()
-    val getDirectPrimaryCareResponse by viewModel.getDirectPrimaryCareResponse.collectAsState()
-//    val getPediatricTelemedicineDetail by viewModel.getPediatricTelemedicineDetail.collectAsState()
-//    val telemedicineResponse by viewModel.telemedicineResponse.collectAsState()
+    val responseHandlercard by viewModel.getDirectPrimaryCareResponse.collectAsState()
+
 
     LaunchedEffect(Unit) {
         topBar(
@@ -62,7 +59,7 @@ fun HomeScreenView(
         bottomBarVisibility(true)
     }
 
-    when (responseHandler) {
+    when (responseHandlercard) {
         is ResponseHandler.Loading -> {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -73,7 +70,7 @@ fun HomeScreenView(
 
         is ResponseHandler.OnError -> {
             Text(
-                text = "Error: ${(responseHandler as ResponseHandler.OnError).message}",
+                text = "Error: ${(responseHandlercard as ResponseHandler.OnError).message}",
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(align = Alignment.Center)
@@ -82,11 +79,21 @@ fun HomeScreenView(
 
         is ResponseHandler.OnSuccessResponse -> {
 
+
+            lateinit var context: Context
+            lateinit var sharedPreferences: SharedPreferences
+
+            // Initialize SharedPreferences
+            sharedPreferences = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
+
+            // Set a boolean value
+            setLoginStatus(true)
             LazyColumn {
-                items((responseHandler as ResponseHandler.OnSuccessResponse<List<MovieCharacter>>).response) { item ->
+                items((responseHandlercard as ResponseHandler.OnSuccessResponse<List<GetPediatricTelemedicineResponse>>).response) { item ->
                     HomeUI(character = item)
                 }
             }
+
         }
 
         else -> {
@@ -100,10 +107,18 @@ fun HomeScreenView(
     }
 }
 
+fun setLoginStatus(b: Boolean) {
+    lateinit var sharedPreferences: SharedPreferences
+    val editor = sharedPreferences.edit()
+    editor.putBoolean("isLogin", b)
+    editor.apply()
+}
+
 
 @Composable
-fun HomeUI(character: MovieCharacter) {
-    val imagerPainter = rememberAsyncImagePainter(model = character.image)
+fun HomeUI(character: GetPediatricTelemedicineResponse) {
+    val imagerPainter =
+        rememberAsyncImagePainter(model = character.specialitiesDashBoardItems?.get(0)?.name)
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -130,8 +145,13 @@ fun HomeUI(character: MovieCharacter) {
                         .fillMaxWidth()
                         .padding(4.dp)
                 ) {
-                    Text(text = "Real name: ${character.actor}")
-                    Text(text = "Actor name: ${character.name}")
+                    Text(text = "Real name: ${character.specialitiesDashBoardItems}")
+                    Text(
+                        text = "Actor name: ${
+                            character.specialities?.get(0)
+                                ?.name
+                        }"
+                    )
                 }
             }
         }
