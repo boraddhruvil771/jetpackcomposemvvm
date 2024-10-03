@@ -130,11 +130,7 @@ fun HomeScreenView(
 
 @Composable
 // Define the HomeUI function to display character details
-fun HomeUI(character: DocumentsResponseModel) {/*
-        val imagePainter =
-            rememberAsyncImagePainter(model = character.get(index = 1).thumbnail_link) // Assuming imageUrl is a property of DocumentsResponseModel
-    */
-
+fun HomeUI(character: DocumentsResponseModel) {
     val context = LocalContext.current
 
     val imagePainter = rememberAsyncImagePainter(
