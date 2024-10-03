@@ -185,6 +185,10 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
         var isPasswordValid by remember { mutableStateOf(true) }
 
 
+        val mobileNumberMaxLength = 11 // Set your desired max length for mobile number
+        val passwordMaxLength = 16 // Set your desired max length for password
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -236,8 +240,11 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
 
                 OutlinedTextField(
                     value = mobileNumber,
-                    onValueChange = { mobileNumber = it },
-                    isError = !isMobileNumberValid,
+                    onValueChange = {
+                        if (it.length <= mobileNumberMaxLength) { // Check length before updating
+                            mobileNumber = it
+                        }
+                    }, isError = !isMobileNumberValid,
                     label = { Text("Mobile Number") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
@@ -247,8 +254,11 @@ fun signupView(navController: NavController, signupViewModel: SignupViewmodel) {
 
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
+                    onValueChange = {
+                        if (it.length <= passwordMaxLength) { // Check length before updating
+                            password = it
+                        }
+                    }, label = { Text("Password") },
                     isError = !isPasswordValid,
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = PasswordVisualTransformation(),

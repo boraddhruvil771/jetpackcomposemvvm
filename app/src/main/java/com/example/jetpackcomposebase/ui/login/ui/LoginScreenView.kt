@@ -181,6 +181,10 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
         var isMobileNumberValid by remember { mutableStateOf(true) }
         var isPasswordValid by remember { mutableStateOf(true) }
 
+        val mobileNumberMaxLength = 12 // Set your desired max length for mobile number
+        val passwordMaxLength = 16 // Set your desired max length for password
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -207,8 +211,16 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
 
             OutlinedTextField(
                 value = mobileNumber,
-                onValueChange = { mobileNumber = it },
-                label = { Text("Mobile Number") },
+                onValueChange = {
+                    if (it.length <= mobileNumberMaxLength) {
+                        // Prepend '+' if it's not already present and the input is not empty
+                        mobileNumber = if (it.isEmpty() || it.startsWith("+")) {
+                            it
+                        } else {
+                            "+" + it
+                        }
+                    }
+                }, label = { Text("Mobile Number") },
                 isError = !isMobileNumberValid,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier
@@ -218,8 +230,11 @@ fun loginView(navController: NavController, loginViewModel: LoginViewModel = hil
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
+                onValueChange = {
+                    if (it.length <= passwordMaxLength) { // Check length before updating
+                        password = it
+                    }
+                }, label = { Text("Password") },
                 isError = !isPasswordValid, // Set error state
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
