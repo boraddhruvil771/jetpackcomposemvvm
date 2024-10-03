@@ -5,8 +5,8 @@ import com.example.jetpackcomposebase.base.ViewModelBase
 import com.example.jetpackcomposebase.network.ApiInterface
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
+import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
-import com.example.jetpackcomposebase.ui.dashboard.model.MovieCharacter
 import com.example.jetpackcomposebase.ui.dashboard.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,16 +21,11 @@ class HomeViewModel @Inject constructor(
 ) : ViewModelBase() {
 
 
-    private val _state =
-        MutableStateFlow<ResponseHandler<List<MovieCharacter>>>(ResponseHandler.Empty)
-    val state: StateFlow<ResponseHandler<List<MovieCharacter>>>
-        get() = _state
-
 
     init {
         viewModelScope.launch {
-            homeRepository.getCharacters().collect { characters ->
-                _state.value = characters
+            homeRepository.callGetPediatricTelemedicineResponse().collect { characters ->
+                _getDirectPrimaryCareResponse.value = characters
             }
         }
     }
@@ -50,6 +45,27 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             homeRepository.callGetPediatricTelemedicineResponse().collect { it ->
                 _getDirectPrimaryCareResponse.value = it
+            }
+        }
+    }
+
+
+    private val _documentsResponse =
+        MutableStateFlow<ResponseHandler<ResponseData<DocumentsResponseModel>?>>(
+            ResponseHandler.Empty
+        )
+
+    val documentResponse: StateFlow<ResponseHandler<ResponseData<DocumentsResponseModel>?>>
+        get() = _documentsResponse
+
+    /**
+     * This method is for call documents API.
+     */
+    fun callDocumentsAPI() {
+        viewModelScope.launch {
+
+            homeRepository.callDocumentsAPI().collect { it ->
+                _documentsResponse.value = it
             }
         }
     }

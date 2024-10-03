@@ -1,6 +1,8 @@
 package com.example.jetpackcomposebase.ui.dashboard.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerState
@@ -22,14 +23,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
+import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
-import com.example.jetpackcomposebase.ui.dashboard.model.MovieCharacter
+import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.viewmodel.HomeViewModel
 
 @Composable
@@ -41,15 +47,12 @@ fun HomeScreenView(
     circularProgress: (Boolean) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val responseHandler by viewModel.state.collectAsState()
-//    viewModel.callGetTelemedicineDetail()
-    viewModel.callGetDirectPrimaryCareResponse()
-//    viewModel.callPediatricTelemedicineDetail()
-    val getDirectPrimaryCareResponse by viewModel.getDirectPrimaryCareResponse.collectAsState()
-//    val getPediatricTelemedicineDetail by viewModel.getPediatricTelemedicineDetail.collectAsState()
-//    val telemedicineResponse by viewModel.telemedicineResponse.collectAsState()
+    // State variables
+    val responsedocumentResponse by viewModel.documentResponse.collectAsState()
 
+    // Ensure that the API call is made only once when the HomeScreenView is composed
     LaunchedEffect(Unit) {
+        // Set up the toolbar and bottom bar visibility
         topBar(
             ToolBarData(
                 title = "Home",
@@ -60,9 +63,12 @@ fun HomeScreenView(
             )
         )
         bottomBarVisibility(true)
+
+        viewModel.callDocumentsAPI()
     }
 
-    when (responseHandler) {
+    // Handling the response state
+    when (responsedocumentResponse) {
         is ResponseHandler.Loading -> {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -73,7 +79,7 @@ fun HomeScreenView(
 
         is ResponseHandler.OnError -> {
             Text(
-                text = "Error: ${(responseHandler as ResponseHandler.OnError).message}",
+                text = "Error: ${(responsedocumentResponse as ResponseHandler.OnError).message}",
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(align = Alignment.Center)
@@ -81,10 +87,26 @@ fun HomeScreenView(
         }
 
         is ResponseHandler.OnSuccessResponse -> {
+            // Fetch and display the list of documents
+            val context = LocalContext.current
+            val documents =
+                (responsedocumentResponse as ResponseHandler.OnSuccessResponse<ResponseData<DocumentsResponseModel>>).response
 
-            LazyColumn {
-                items((responseHandler as ResponseHandler.OnSuccessResponse<List<MovieCharacter>>).response) { item ->
-                    HomeUI(character = item)
+            LaunchedEffect(key1 = documents) {
+                documents.listOfData?.let { list ->
+                    Toast.makeText(
+                        context,
+                        "data fetched successfully: $list",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            documents.data?.let { list ->
+                LazyColumn {
+                    items(list.size) { index ->
+                        HomeUI(character = list) // Pass each item to HomeUI
+                    }
                 }
             }
         }
@@ -100,19 +122,28 @@ fun HomeScreenView(
     }
 }
 
-
 @Composable
-fun HomeUI(character: MovieCharacter) {
-    val imagerPainter = rememberAsyncImagePainter(model = character.image)
+// Define the HomeUI function to display character details
+fun HomeUI(character: DocumentsResponseModel) {/*
+        val imagePainter =
+            rememberAsyncImagePainter(model = character.get(index = 1).thumbnail_link) // Assuming imageUrl is a property of DocumentsResponseModel
+    */
+
+    val imagePainter = rememberAsyncImagePainter(
+        model = character.get(index = 1).thumbnail_link,
+        placeholder = painterResource(id = R.drawable.ic_launcher_background),
+        error = painterResource(id = R.drawable.baseline_arrow_back_ios_24)
+    )
 
     Card(
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .padding(16.dp)
+            .background(Color.Red)
     ) {
         Box {
-
             Image(
-                painter = imagerPainter,
+                painter = imagePainter,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,10 +161,11 @@ fun HomeUI(character: MovieCharacter) {
                         .fillMaxWidth()
                         .padding(4.dp)
                 ) {
-                    Text(text = "Real name: ${character.actor}")
-                    Text(text = "Actor name: ${character.name}")
+                    Text(text = "Real name: ${character.get(index = 1).en_link}")  // Assuming realName is a property
+                    Text(text = "File Type: ${character.get(index = 1).fileType}")  // Assuming actorName is a property
                 }
             }
         }
     }
 }
+

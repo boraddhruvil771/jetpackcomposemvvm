@@ -6,9 +6,8 @@ import com.example.jetpackcomposebase.base.BaseRepository
 import com.example.jetpackcomposebase.network.ApiInterface
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
-import com.example.jetpackcomposebase.ui.dashboard.model.GetDirectPrimaryCareResponse
+import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
-import com.example.jetpackcomposebase.ui.dashboard.model.MovieCharacter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -19,18 +18,53 @@ open class HomeRepository @Inject constructor(private val apiInterface: ApiInter
     BaseRepository() {
 
 
-    fun getCharacters(): Flow<ResponseHandler<List<MovieCharacter>>> = flow {
-        emit(ResponseHandler.Loading)
-        try {
-            val response = apiInterface.getCharacters()
-            if (response.isSuccessful) {
-                val characters = response.body() ?: emptyList()
-                emit(ResponseHandler.OnSuccessResponse(characters))
-            } else {
-                emit(ResponseHandler.OnFailed(response.code(), "Error message", "Error code"))
+    /*    fun getCharacters(): Flow<ResponseHandler<List<MovieCharacter>>> = flow {
+            emit(ResponseHandler.Loading)
+            try {
+                val response = apiInterface.getCharacters()
+                if (response.isSuccessful) {
+                    val characters = response.body() ?: emptyList()
+                    emit(ResponseHandler.OnSuccessResponse(characters))
+                } else {
+                    emit(ResponseHandler.OnFailed(response.code(), "Error message", "Error code"))
+                }
+            } catch (e: Exception) {
+                emit(ResponseHandler.OnError(e.message ?: "Unknown error"))
             }
+        }*/
+
+    open suspend fun callDocumentsAPI(): Flow<ResponseHandler<ResponseData<DocumentsResponseModel>?>> = flow {
+        try {
+            val response = apiInterface.getDocuments()
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(ResponseHandler.OnSuccessResponse(it))
+                } ?: emit(ResponseHandler.OnFailed(response.code(), "Empty response body", ""))
+            } else {
+                emit(ResponseHandler.OnFailed(response.code(), response.message(), ""))
+            }
+        } catch (e: HttpException) {
+            Log.e(TAG, "HttpException: ${e.localizedMessage}", e)
+            emit(
+                ResponseHandler.OnFailed(
+                    e.code(), "An unexpected error occurred: ${e.localizedMessage}", ""
+                )
+            )
+        } catch (e: IOException) {
+            Log.e(TAG, "IOException: ${e.localizedMessage}", e)
+            emit(
+                ResponseHandler.OnFailed(
+                    500, "Couldn't reach server. Check your internet connection.", ""
+                )
+            )
         } catch (e: Exception) {
-            emit(ResponseHandler.OnError(e.message ?: "Unknown error"))
+            Log.e(TAG, "Exception: ${e.localizedMessage}", e)
+            emit(
+                ResponseHandler.OnFailed(
+                    500, "An unknown error occurred: ${e.localizedMessage}", ""
+                )
+            )
         }
     }
 
@@ -71,79 +105,79 @@ open class HomeRepository @Inject constructor(private val apiInterface: ApiInter
         }
     }
 
-/*    open suspend fun callGetDirectPrimaryCareResponse(
-    ): Flow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>> = flow {
-        try {
+    /*    open suspend fun callGetDirectPrimaryCareResponse(
+        ): Flow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>> = flow {
+            try {
 
-            val response = apiInterface.getTelemedicineDetail()
+                val response = apiInterface.getTelemedicineDetail()
 
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    emit(ResponseHandler.OnSuccessResponse(it))
-                } ?: emit(ResponseHandler.OnFailed(response.code(), "Empty response body", ""))
-            } else {
-                emit(ResponseHandler.OnFailed(response.code(), response.message(), ""))
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(ResponseHandler.OnSuccessResponse(it))
+                    } ?: emit(ResponseHandler.OnFailed(response.code(), "Empty response body", ""))
+                } else {
+                    emit(ResponseHandler.OnFailed(response.code(), response.message(), ""))
+                }
+            } catch (e: HttpException) {
+                Log.e(TAG, "HttpException: ${e.localizedMessage}", e)
+                emit(
+                    ResponseHandler.OnFailed(
+                        e.code(), "An unexpected error occurred: ${e.localizedMessage}", ""
+                    )
+                )
+            } catch (e: IOException) {
+                Log.e(TAG, "IOException: ${e.localizedMessage}", e)
+                emit(
+                    ResponseHandler.OnFailed(
+                        500, "Couldn't reach server. Check your internet connection.", ""
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception: ${e.localizedMessage}", e)
+                emit(
+                    ResponseHandler.OnFailed(
+                        500, "An unknown error occurred: ${e.localizedMessage}", ""
+                    )
+                )
             }
-        } catch (e: HttpException) {
-            Log.e(TAG, "HttpException: ${e.localizedMessage}", e)
-            emit(
-                ResponseHandler.OnFailed(
-                    e.code(), "An unexpected error occurred: ${e.localizedMessage}", ""
-                )
-            )
-        } catch (e: IOException) {
-            Log.e(TAG, "IOException: ${e.localizedMessage}", e)
-            emit(
-                ResponseHandler.OnFailed(
-                    500, "Couldn't reach server. Check your internet connection.", ""
-                )
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Exception: ${e.localizedMessage}", e)
-            emit(
-                ResponseHandler.OnFailed(
-                    500, "An unknown error occurred: ${e.localizedMessage}", ""
-                )
-            )
         }
-    }
 
-    open suspend fun getPediatricTelemedicineDetail(
-    ): Flow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>> = flow {
-        try {
+        open suspend fun getPediatricTelemedicineDetail(
+        ): Flow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>> = flow {
+            try {
 
-            val response = apiInterface.getDirectPrimaryCareDetail()
+                val response = apiInterface.getDirectPrimaryCareDetail()
 
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    emit(ResponseHandler.OnSuccessResponse(it))
-                } ?: emit(ResponseHandler.OnFailed(response.code(), "Empty response body", ""))
-            } else {
-                emit(ResponseHandler.OnFailed(response.code(), response.message(), ""))
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(ResponseHandler.OnSuccessResponse(it))
+                    } ?: emit(ResponseHandler.OnFailed(response.code(), "Empty response body", ""))
+                } else {
+                    emit(ResponseHandler.OnFailed(response.code(), response.message(), ""))
+                }
+            } catch (e: HttpException) {
+                Log.e(TAG, "HttpException: ${e.localizedMessage}", e)
+                emit(
+                    ResponseHandler.OnFailed(
+                        e.code(), "An unexpected error occurred: ${e.localizedMessage}", ""
+                    )
+                )
+            } catch (e: IOException) {
+                Log.e(TAG, "IOException: ${e.localizedMessage}", e)
+                emit(
+                    ResponseHandler.OnFailed(
+                        500, "Couldn't reach server. Check your internet connection.", ""
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception: ${e.localizedMessage}", e)
+                emit(
+                    ResponseHandler.OnFailed(
+                        500, "An unknown error occurred: ${e.localizedMessage}", ""
+                    )
+                )
             }
-        } catch (e: HttpException) {
-            Log.e(TAG, "HttpException: ${e.localizedMessage}", e)
-            emit(
-                ResponseHandler.OnFailed(
-                    e.code(), "An unexpected error occurred: ${e.localizedMessage}", ""
-                )
-            )
-        } catch (e: IOException) {
-            Log.e(TAG, "IOException: ${e.localizedMessage}", e)
-            emit(
-                ResponseHandler.OnFailed(
-                    500, "Couldn't reach server. Check your internet connection.", ""
-                )
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Exception: ${e.localizedMessage}", e)
-            emit(
-                ResponseHandler.OnFailed(
-                    500, "An unknown error occurred: ${e.localizedMessage}", ""
-                )
-            )
-        }
-    }*/
+        }*/
 
 }
 

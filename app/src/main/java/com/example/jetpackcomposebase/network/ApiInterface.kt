@@ -1,8 +1,8 @@
 package com.example.jetpackcomposebase.network
 
+import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.model.GetDirectPrimaryCareResponse
 import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
-import com.example.jetpackcomposebase.ui.dashboard.model.MovieCharacter
 import com.example.jetpackcomposebase.ui.login.model.LoginRequest
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
 import com.example.jetpackcomposebase.ui.signup.model.SignUpRequest
@@ -18,8 +18,10 @@ import javax.inject.Singleton
 @Singleton
 interface ApiInterface {
 
-    @GET("characters")
-    suspend fun getCharacters(): Response<List<MovieCharacter>>
+    /*
+        @GET("characters")
+        suspend fun getCharacters(): Response<List<MovieCharacter>>
+    */
 
     @POST(ApiHelper.LOGIN_API)
     suspend fun getLogin(@Body loginRequest: LoginRequest): Response<ResponseData<LoginResponseModel>>
@@ -29,9 +31,6 @@ interface ApiInterface {
 
     @POST(ApiHelper.GET_TELEMEDICINE_DETAIL_API)
     suspend fun getPediatricTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
-/*
-    @POST(ApiHelper.GET_TELEMEDICINE_DETAIL_API)
-    suspend fun getPediatricTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
 
     @POST(ApiHelper.GET_TELEMEDICINE_API)
     suspend fun getTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
@@ -39,7 +38,8 @@ interface ApiInterface {
     @GET(ApiHelper.PRIMARY_CARE_API)
     suspend fun getDirectPrimaryCareDetail(): Response<ResponseData<GetDirectPrimaryCareResponse>>
 
-*/
+    @GET(ApiHelper.DOCUMENTS_API)
+    suspend fun getDocuments(): Response<ResponseData<DocumentsResponseModel>>
 
 
 }
