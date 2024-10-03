@@ -86,6 +86,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.browser)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
 

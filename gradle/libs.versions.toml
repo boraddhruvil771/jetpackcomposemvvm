@@ -49,6 +49,7 @@ startupRuntime = "1.1.1"
 sentry-android = "7.12.0"
 sentry-compose-android = "7.12.0"
 webkit = "1.11.0"
+browser = "1.8.0"
 
 
 [libraries]
@@ -123,6 +124,7 @@ sdp-ssp-compose-multiplatform = { group = "network.chaintech", name = "sdp-ssp-c
 ssp-android = { group = "com.intuit.ssp", name = "ssp-android", version.ref = "sspAndroid" }
 sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry-android" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android", version.ref = "sentry-compose-android" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
 
 [plugins]

@@ -1,8 +1,14 @@
 package com.example.jetpackcomposebase.ui.dashboard.ui
 
+import android.app.DownloadManager
+import android.content.Context
+import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -129,6 +135,8 @@ fun HomeUI(character: DocumentsResponseModel) {/*
             rememberAsyncImagePainter(model = character.get(index = 1).thumbnail_link) // Assuming imageUrl is a property of DocumentsResponseModel
     */
 
+    val context = LocalContext.current
+
     val imagePainter = rememberAsyncImagePainter(
         model = character.get(index = 1).thumbnail_link,
         placeholder = painterResource(id = R.drawable.ic_launcher_background),
@@ -153,7 +161,13 @@ fun HomeUI(character: DocumentsResponseModel) {/*
 
             Surface(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = .3f),
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .clickable {
+                        // Call the download or open WebView function
+                        val url = character.get(index = 1).en_link
+                        openUrlOrDownload(context, url)
+                    },
                 contentColor = MaterialTheme.colorScheme.surface
             ) {
                 Column(
@@ -161,11 +175,35 @@ fun HomeUI(character: DocumentsResponseModel) {/*
                         .fillMaxWidth()
                         .padding(4.dp)
                 ) {
-                    Text(text = "Real name: ${character.get(index = 1).en_link}")  // Assuming realName is a property
-                    Text(text = "File Type: ${character.get(index = 1).fileType}")  // Assuming actorName is a property
+                    Text(text = "Download link: ${character.get(index = 1).en_link}")
+                    Text(text = "File Type: ${character.get(index = 1).fileType}")
                 }
             }
+
         }
+    }
+}
+
+fun openUrlOrDownload(context: Context, url: String?) {
+    if (url!!.endsWith(".pdf") || url.endsWith(".doc") || url.endsWith(".zip")) {
+        // Download the file
+        Toast.makeText(context, "File Downloading started", Toast.LENGTH_SHORT).show()
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setTitle("File Download")
+            .setDescription("Downloading file...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                url!!.substringAfterLast("/")
+            )
+
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
+    } else {
+        // Open in a web browser (CustomTabsIntent or default browser)
+        val builder = CustomTabsIntent.Builder()
+        val customTabsIntent = builder.build()
+        customTabsIntent.launchUrl(context, Uri.parse(url))
     }
 }
 
