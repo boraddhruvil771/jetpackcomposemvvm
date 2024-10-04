@@ -128,7 +128,13 @@ fun LoginUI(
                 "TAG",
                 "LoginUI: on success${(responseApi as ResponseHandler.OnSuccessResponse).response?.status}"
             )
+
+            val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+            val editor = sharedPref.edit()
             if ((responseApi as ResponseHandler.OnSuccessResponse).response?.status_code == 200) {
+
+                editor.putBoolean("isLoggedIn", true)
+                editor.apply()
 
                 navController.navigate(NAV_HOME)
 

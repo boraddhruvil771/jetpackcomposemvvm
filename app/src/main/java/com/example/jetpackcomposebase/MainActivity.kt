@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var dataStoreUtil: DataStoreUtil
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val languageCode = mPref.getValueString(PrefKey.SELECTED_LANGUAGE, PrefKey.EN_CODE)
