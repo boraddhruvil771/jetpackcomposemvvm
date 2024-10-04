@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.jetpackcomposebase.base.LocaleManager
 import com.example.jetpackcomposebase.utils.DataStoreUtil
@@ -30,6 +31,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var dataStoreUtil: DataStoreUtil
+
+    private val viewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val languageCode = mPref.getValueString(PrefKey.SELECTED_LANGUAGE, PrefKey.EN_CODE)

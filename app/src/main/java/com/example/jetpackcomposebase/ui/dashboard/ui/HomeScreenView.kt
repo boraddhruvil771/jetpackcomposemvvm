@@ -9,30 +9,42 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -111,7 +123,7 @@ fun HomeScreenView(
             documents.data?.let { list ->
                 LazyColumn {
                     items(list.size) { index ->
-                        HomeUI(character = list) // Pass each item to HomeUI
+                        HomeUICard(character = list) // Pass each item to HomeUI
                     }
                 }
             }
@@ -130,7 +142,7 @@ fun HomeScreenView(
 
 @Composable
 // Define the HomeUI function to display character details
-fun HomeUI(character: DocumentsResponseModel) {
+fun HomeUICard(character: DocumentsResponseModel) {
     val context = LocalContext.current
 
     val imagePainter = rememberAsyncImagePainter(
@@ -139,43 +151,83 @@ fun HomeUI(character: DocumentsResponseModel) {
         error = painterResource(id = R.drawable.baseline_arrow_back_ios_24)
     )
 
+    // Main card layout
     Card(
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier
-            .padding(16.dp)
-            .background(Color.Red)
+            .padding(8.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
     ) {
-        Box {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Thumbnail Image
             Image(
                 painter = imagePainter,
-                contentDescription = null,
+                contentDescription = "Thumbnail",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.FillBounds
+                    .size(60.dp) // Set the size of the thumbnail
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
             )
 
-            Surface(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .3f),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .clickable {
-                        // Call the download or open WebView function
-                        val url = character.get(index = 1).en_link
-                        openUrlOrDownload(context, url)
-                    },
-                contentColor = MaterialTheme.colorScheme.surface
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Title, Description, and Date Column
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
+                // File Type and Title
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Download link: ${character.get(index = 1).en_link}")
-                    Text(text = "File Type: ${character.get(index = 1).fileType}")
+                    character.get(index = 1).fileType?.let {
+                        Text(
+                            text = it.uppercase(), // E.g., PDF or VIDEO
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                            color = Color.Blue // Set color based on file type
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Document Title
+                Text(
+                    text = character.get(index = 1).fileName.toString(),
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Date
+                Text(
+                    text = character.get(index = 1).createdAt.toString(),
+                    color = Color.Gray
+                )
             }
 
+            // "View" Button
+            TextButton(
+                onClick = {
+                    val url = character.get(index = 1).en_link
+                    openUrlOrDownload(context, url)
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
+                Text(text = "View")
+            }
         }
     }
 }

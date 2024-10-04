@@ -3,6 +3,7 @@ package com.example.jetpackcomposebase.network
 import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.model.GetDirectPrimaryCareResponse
 import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
+import com.example.jetpackcomposebase.ui.dashboard.model.VerifyNotificationRequest
 import com.example.jetpackcomposebase.ui.login.model.LoginRequest
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
 import com.example.jetpackcomposebase.ui.signup.model.SignUpRequest
@@ -32,14 +33,23 @@ interface ApiInterface {
     @POST(ApiHelper.GET_TELEMEDICINE_DETAIL_API)
     suspend fun getPediatricTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
 
-    @POST(ApiHelper.GET_TELEMEDICINE_API)
-    suspend fun getTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
+
+    @POST(ApiHelper.REFRESH_TOKEN_API)
+    suspend fun getNewToken(@Body verifyNotificationRequest: VerifyNotificationRequest): Response<ResponseData<LoginResponseModel>>
+
+    /*
 
     @GET(ApiHelper.PRIMARY_CARE_API)
     suspend fun getDirectPrimaryCareDetail(): Response<ResponseData<GetDirectPrimaryCareResponse>>
 
+    @POST(ApiHelper.GET_TELEMEDICINE_API)
+    suspend fun getTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
+*/
+
     @GET(ApiHelper.DOCUMENTS_API)
     suspend fun getDocuments(): Response<ResponseData<DocumentsResponseModel>>
+
+
 
 
 }

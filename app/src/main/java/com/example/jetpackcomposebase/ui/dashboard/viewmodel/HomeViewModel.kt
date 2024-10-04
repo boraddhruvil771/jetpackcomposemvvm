@@ -70,7 +70,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
+//
 //    private val _telemedicineResponse =
 //        MutableStateFlow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>>(
 //            ResponseHandler.Empty

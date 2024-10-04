@@ -152,6 +152,21 @@ fun JetpackBaseApp(
                                     navController.navigateUp()
                                 },
                                 onLogoutClick = {
+
+
+                                    // Get context to access SharedPreferences
+                                    /*
+                                                                        val context = LocalContext.current
+                                                                        val sharedPref = context.getSharedPreferences(
+                                                                            "user_prefs",
+                                                                            Context.MODE_PRIVATE
+                                                                        )
+                                                                        val editor = sharedPref.edit()
+
+                                                                        editor.putBoolean("isLoggedIn", false)
+                                                                        editor.apply()
+                                    */
+
                                     navController.navigate(NAV_LOGIN)
                                 },
                                 navController = navController
