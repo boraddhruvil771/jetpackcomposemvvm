@@ -27,7 +27,6 @@ import com.example.jetpackcomposebase.R
 import com.example.jetpackcomposebase.base.ToolBarData
 import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
-import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
 import com.example.jetpackcomposebase.ui.profile.ui.viewmodel.ProfileScreenViewmodel
 
@@ -42,7 +41,8 @@ fun ProfileScreenView(
 ) {
     val title = stringResource(id = R.string.lbl_profile)
 
-    val responseDirectPrimaryCare by profileScreenViewmodel.getDirectPrimaryCareResponse.collectAsState();
+    val responseDirectPrimaryCare by profileScreenViewmodel.getDirectPrimaryCareResponse.collectAsState()
+    val responseGetTelemedineDetails by profileScreenViewmodel.telemedicineResponse.collectAsState()
 
     LaunchedEffect(Unit) {
         topBar(
@@ -57,6 +57,7 @@ fun ProfileScreenView(
         bottomBarVisibility(true)
         circularProgress(false)
         profileScreenViewmodel.callGetDirectPrimaryCareResponse()
+        profileScreenViewmodel.callGetTelemedicineDetail()
 
     }
     // Handling the response state
@@ -106,17 +107,74 @@ fun ProfileScreenView(
         }
 
         else -> {
-/*
-            Text(
-                text = "No data available",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentSize(align = Alignment.Center)import com.example.jetpackcomposebase.ui.dashboard.ui.HomeUI
-
-            )
-*/
+            /*
+                        Text(
+                            text = "No data available",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentSize(align = Alignment.Center)import com.example.jetpackcomposebase.ui.dashboard.ui.HomeUI
+                        )
+            */
         }
     }
+    when (responseGetTelemedineDetails) {
+        is ResponseHandler.Loading -> {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
+            )
+        }
+
+        is ResponseHandler.OnError -> {
+            Text(
+                text = "Error: ${(responseGetTelemedineDetails as ResponseHandler.OnError).message}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(align = Alignment.Center)
+            )
+        }
+
+        is ResponseHandler.OnSuccessResponse -> {
+            // Fetch and display the list of documents
+            val context = LocalContext.current
+            val documents =
+                (responseGetTelemedineDetails as ResponseHandler.OnSuccessResponse<ResponseData<GetPediatricTelemedicineResponse>>).response
+
+            LaunchedEffect(key1 = documents) {
+                documents.listOfData?.let { list ->
+                    Toast.makeText(
+                        context,
+                        "data fetched successfully: $list",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            documents.listOfData?.let { list ->
+                LazyColumn {
+/*                    list.get(1)?.let {
+                        items(it) { index ->
+                            HomeUI(character = list) // Pass each item to HomeUI
+                        }
+                    }*/
+                }
+            }
+        }
+
+        else -> {
+            /*
+                        Text(
+                            text = "No data available",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentSize(align = Alignment.Center)import com.example.jetpackcomposebase.ui.dashboard.ui.HomeUI
+
+                        )
+            */
+        }
+    }
+
     ProfileUI()
 }
 

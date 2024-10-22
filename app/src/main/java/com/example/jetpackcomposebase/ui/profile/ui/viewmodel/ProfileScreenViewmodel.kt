@@ -24,6 +24,10 @@ class ProfileScreenViewmodel @Inject constructor(
             homeRepository.callGetPediatricTelemedicineResponse().collect { characters ->
                 _getDirectPrimaryCareResponse.value = characters
             }
+            homeRepository.getTelemedicineDetail().collect { characters ->
+                _telemedicineResponse.value = characters
+            }
+
         }
     }
 
@@ -47,18 +51,16 @@ class ProfileScreenViewmodel @Inject constructor(
     }
 
 
-    /*
-        private val _telemedicineResponse =
-            MutableStateFlow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>>(
-                ResponseHandler.Empty
-            )
-        val telemedicineResponse: StateFlow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>>
-            get() = _telemedicineResponse
+    private val _telemedicineResponse =
+        MutableStateFlow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>>(
+            ResponseHandler.Empty
+        )
+    val telemedicineResponse: StateFlow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>>
+        get() = _telemedicineResponse
 
-        */
     /**
      * This method is for call pediatric telemedicine detail API.
-     *//*
+     */
     fun callGetTelemedicineDetail() {
 
         viewModelScope.launch {
@@ -69,26 +71,20 @@ class ProfileScreenViewmodel @Inject constructor(
     }
 
 
-    private val _getPediatricTelemedicineDetail =
-        MutableStateFlow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>>(
-            ResponseHandler.Empty
-        )
-    val getPediatricTelemedicineDetail: StateFlow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>>
-        get() = _getPediatricTelemedicineDetail
+    /*    private val _getPediatricTelemedicineDetail =
+            MutableStateFlow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>>(
+                ResponseHandler.Empty
+            )
+        val getPediatricTelemedicineDetail: StateFlow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>>
+            get() = _getPediatricTelemedicineDetail
 
-    */
-    /**
-     * This method is for call pediatric telemedicine detail API.
-     *//*
-    fun callPediatricTelemedicineDetail() {
 
-        viewModelScope.launch {
-            homeRepository.callGetPediatricTelemedicineResponse().collect { it ->
-                _getPediatricTelemedicineDetail.value = it
+        fun callPediatricTelemedicineDetail() {
+
+            viewModelScope.launch {
+                homeRepository.callGetPediatricTelemedicineResponse().collect { it ->
+                    _getPediatricTelemedicineDetail.value = it
+                }
             }
-        }
-    }
-    */
-
-
+        }*/
 }

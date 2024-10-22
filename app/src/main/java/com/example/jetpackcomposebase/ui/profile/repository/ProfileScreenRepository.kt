@@ -55,7 +55,7 @@ open class ProfileScreenRepository @Inject constructor(private val apiInterface:
         }
     }
 
-   /* open suspend fun callGetDirectPrimaryCareResponse(
+/*    open suspend fun callGetDirectPrimaryCareResponse(
     ): Flow<ResponseHandler<ResponseData<GetDirectPrimaryCareResponse>?>> = flow {
         try {
 
@@ -90,7 +90,7 @@ open class ProfileScreenRepository @Inject constructor(private val apiInterface:
                 )
             )
         }
-    }
+    }*/
 
     open suspend fun getTelemedicineDetail(
     ): Flow<ResponseHandler<ResponseData<GetPediatricTelemedicineResponse>?>> = flow {
@@ -127,6 +127,6 @@ open class ProfileScreenRepository @Inject constructor(private val apiInterface:
                 )
             )
         }
-    }*/
+    }
 
 }

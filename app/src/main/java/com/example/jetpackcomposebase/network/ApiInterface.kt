@@ -1,5 +1,6 @@
 package com.example.jetpackcomposebase.network
 
+import com.example.jetpackcomposebase.model.UpdateFCMTokenRequest
 import com.example.jetpackcomposebase.ui.dashboard.model.DocumentsResponseModel
 import com.example.jetpackcomposebase.ui.dashboard.model.GetDirectPrimaryCareResponse
 import com.example.jetpackcomposebase.ui.dashboard.model.GetPediatricTelemedicineResponse
@@ -37,19 +38,18 @@ interface ApiInterface {
     @POST(ApiHelper.REFRESH_TOKEN_API)
     suspend fun getNewToken(@Body verifyNotificationRequest: VerifyNotificationRequest): Response<ResponseData<LoginResponseModel>>
 
-    /*
+    @POST(ApiHelper.UPDATE_DEVICE_DATA_API)
+    suspend fun getUpdateFCMToken(@Body updateFCMTokenRequest: UpdateFCMTokenRequest): Response<ResponseData<LoginResponseModel>>
+
 
     @GET(ApiHelper.PRIMARY_CARE_API)
     suspend fun getDirectPrimaryCareDetail(): Response<ResponseData<GetDirectPrimaryCareResponse>>
 
     @POST(ApiHelper.GET_TELEMEDICINE_API)
     suspend fun getTelemedicineDetail(): Response<ResponseData<GetPediatricTelemedicineResponse>>
-*/
 
     @GET(ApiHelper.DOCUMENTS_API)
     suspend fun getDocuments(): Response<ResponseData<DocumentsResponseModel>>
-
-
 
 
 }
