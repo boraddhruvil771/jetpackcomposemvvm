@@ -8,9 +8,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Scanner
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Scanner
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -92,6 +94,12 @@ fun JetpackBaseApp(
                 selectedIcon = Icons.Filled.Person,
                 unselectedIcon = Icons.Outlined.Person,
                 route = Destination.ProfileScreen.fullRoute
+            ),
+            NavigationItems(
+                title = "Documents",
+                selectedIcon = Icons.Filled.Scanner,
+                unselectedIcon = Icons.Outlined.Scanner,
+                route = Destination.HomeScreen.fullRoute
             ),
         )
 

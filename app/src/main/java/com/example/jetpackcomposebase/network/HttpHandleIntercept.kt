@@ -1,6 +1,11 @@
 package com.example.jetpackcomposebase.network
 
+import com.example.jetpackcomposebase.BuildConfig
+import com.example.jetpackcomposebase.MyApp
+import com.example.jetpackcomposebase.utils.CommonUtils
+import com.example.jetpackcomposebase.utils.Constants
 import com.example.jetpackcomposebase.utils.DebugLog
+import com.google.gson.Gson
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -13,46 +18,95 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class HttpHandleIntercept : Interceptor {
+
+    /**
+     * This method is for Handle intercept.
+     */
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder().headers(getJsonHeader()).build()
-        val response: Response?
+        val request = when (CommonUtils.IS_LOGGED_IN_OTP) {
 
-        response = chain.proceed(request)
-        if (response.code == 401) {
-            return generateCustomResponse(
-                401, "",
-                chain.request()
-            )!!
+            true -> {
+                chain.request().newBuilder().headers(getJsonHeader())
+                    .addHeader(
+                        Constants.AUTHORIZATION,
+                        "${Constants.BEARER} ${
+                            CommonUtils.getData(
+                                MyApp.applicationContext(),
+                                CommonUtils.AUTH_TOKEN_OTP
+                            )
+                        }"
+                    ).build()
+            }
 
-        } else if (response.code == 500) {
-            return generateCustomResponse(
-                500, "",
-                chain.request()
-            )!!
+            else -> {
+                chain.request().newBuilder().headers(getJsonHeader())
+                    .addHeader(
+                        Constants.AUTHORIZATION,
+                        "${Constants.BEARER} ${
+                            CommonUtils.getData(MyApp.applicationContext(), CommonUtils.AUTH_TOKEN)
+                        }"
+                    ).build()
+            }
 
 
         }
 
+        val response: Response? = try {
+            chain.proceed(request)
+        } catch (e: Exception) {
+            null
+        }
+
+        if (response == null) {
+            return generateCustomResponse(
+                401, "SOMETHING_WENT_WRONG",
+                chain.request()
+            )!!
+        } else {
+
+            if (response.code == 401) {
+                return generateCustomResponse(
+                    response.code, response.message,
+                    chain.request()
+                )!!
+
+            } else if (response.code == 500) {
+                return generateCustomResponse(
+                    response.code, response.message,
+                    chain.request()
+                )!!
+            }
+        }
         return response
     }
 
+    /**
+     * This method is for create Json Header in every API.
+     */
     private fun getJsonHeader(): Headers {
         val builder = Headers.Builder()
-        builder.add("Content-Type", "application/json")
-        builder.add("Accept", "application/json")
-        builder.add("is-mobile", "1")
-        builder.add("lang-code", "en")
-        builder.add("Authorization", "Bearer")
+        builder.add(Constants.KEY_CONTENT_TYPE, Constants.APPLICATION_JSON)
+        builder.add(Constants.KEY_ACCEPT_LANGUAGE, "en")
+        builder.add(Constants.ACCEPT_CAPITAL, Constants.APPLICATION_JSON)
+        builder.add(Constants.IS_MOBILE, Constants.IS_MOBILE_1)
+        builder.add(Constants.DEVICE_TYPE, Constants.ANDROID)
+        builder.add(Constants.LANGUAGE_CODE, Constants.EN)
+        builder.add(
+            Constants.VERSION,
+            BuildConfig.VERSION_NAME
+        )
+        DebugLog.d("requestHeader" + Gson().toJson(builder))
         return builder.build()
     }
 
     /**
-     * generate custom response for exception
+     * generate custom response for exception.
      */
     private fun generateCustomResponse(code: Int, message: String, request: Request): Response? {
+
         try {
             val body = ResponseBody.create(
-                "application/json".toMediaTypeOrNull(),
+                Constants.APPLICATION_JSON.toMediaTypeOrNull(),
                 getJSONObjectForException(message, code).toString()
             )
             return Response.Builder()
@@ -66,11 +120,11 @@ class HttpHandleIntercept : Interceptor {
             DebugLog.print(ex)
             return null
         }
-
     }
 
+
     /**
-     * generate JSON object for error case
+     * generate JSON object for error case.
      */
     private fun getJSONObjectForException(message: String, code: Int): JSONObject {
 
@@ -93,6 +147,7 @@ class HttpHandleIntercept : Interceptor {
             return jsonMainObject
         } catch (e: JSONException) {
             DebugLog.print(e)
+
             return JSONObject()
         }
     }

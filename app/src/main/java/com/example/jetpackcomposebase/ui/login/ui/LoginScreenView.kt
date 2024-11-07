@@ -63,6 +63,7 @@ import com.example.jetpackcomposebase.network.ResponseData
 import com.example.jetpackcomposebase.network.ResponseHandler
 import com.example.jetpackcomposebase.ui.login.model.LoginResponseModel
 import com.example.jetpackcomposebase.ui.login.viewmodel.LoginViewModel
+import com.example.jetpackcomposebase.utils.CommonUtils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -124,6 +125,11 @@ fun LoginUI(
 
         is ResponseHandler.OnSuccessResponse -> {
 
+            CommonUtils.setData(
+                context,
+                CommonUtils.AUTH_TOKEN_OTP,
+                (responseApi as ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?>).response?.data!!.accessToken!!
+            )
             Log.d(
                 "TAG",
                 "LoginUI: on success${(responseApi as ResponseHandler.OnSuccessResponse).response?.status}"
@@ -344,7 +350,11 @@ fun observeData(
                 }
 
                 is ResponseHandler.OnSuccessResponse<ResponseData<LoginResponseModel>?> -> {
-
+                    CommonUtils.setData(
+                        context,
+                        CommonUtils.AUTH_TOKEN_OTP,
+                        it.response?.data!!.accessToken!!
+                    )
                 }
 
                 else -> {

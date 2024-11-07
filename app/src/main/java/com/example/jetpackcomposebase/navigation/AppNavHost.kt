@@ -137,12 +137,8 @@ fun AppNavHost(
                 circularProgress = circularProgress
             )
         }
-
     }
-
-
 }
-
 
 fun navigateTo(
     navHostController: NavController,

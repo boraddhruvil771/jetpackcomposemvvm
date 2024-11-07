@@ -238,7 +238,7 @@ fun openUrlOrDownload(context: Context, url: String?) {
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
-                url!!.substringAfterLast("/")
+                url.substringAfterLast("/")
             )
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
